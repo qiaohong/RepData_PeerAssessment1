@@ -1,60 +1,31 @@
-
-```{r }
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-
-
-## Loading and preprocessing the data
-### Assuming that the downloaded file is in working directory
-```{r}
+setwd("/Users/qiaohong/Desktop/Coursera/reproduce/RepData_PeerAssessment1")
 file <- unzip("activity.zip")
 data <- read.csv(file)
-```
-
-## What is mean total number of steps taken per day?
-
-```{r}
 total_steps_day <- aggregate(data$steps, by= list(data$date), na.rm = T, FUN = sum)
 data_clean <-subset(data, !is.na(data$steps) )
 total_per_day <- tapply(data_clean$steps, data_clean$date, sum)
 hist(total_per_day, xlab = "Total steps per day", ylab="Frequency", breaks = 10, main="Histogram for total steps per day")
-```
-###Find the mean and median of total steps per day
-```{r}
 summary(total_per_day)
-```
-## What is the average daily activity pattern?
-```{r}
+
 avg_per_interval <- tapply(data_clean$steps, data_clean$interval, mean)
+
+
 
 plot(avg_per_interval, 
      type="l", 
      ylab="Average steps taken", 
      xlab="Interval #", 
      main="Average steps taken per 5-min interval, all dates")
-```
-### Find out which interval has max steps
-```{r}
+
 names(avg_per_interval[which.max(avg_per_interval)])
-```
-### Find out NA values and its proportion
-```{r}
+
 sum(is.na(data$steps))
 sum(is.na(data$steps))/nrow(data)
-```
 
-
-## Imputing missing values
-### First calculate the mean steps taken per 5-min interval
-```{r}
+## Imputing NA's
+## First calculate the mean steps taken per 5-min interval
 mean_per_interval <- aggregate(data$steps, by= list(data$interval), na.rm = T, FUN = mean)
-```
-### Loop through each row in data, imputing the NA value according to mean_per_interval
-```{r}
+## Loop through each row in data, imputing the NA value according to mean_per_interval
 data_imputed <- data
 for (i in 1:nrow(data)){
   if(is.na(data$steps[[i]])){
@@ -66,16 +37,11 @@ for (i in 1:nrow(data)){
     rm(temp_data_impute)
     }
 }
-```
-### Make a chart
-```{r}
+
 total_per_day_im <- tapply(data_imputed$steps, data_imputed$date, sum)
 hist(total_per_day_im, xlab = "Total steps per day", ylab="Frequency", breaks = 10, main="Histogram for total steps per day")
 summary(total_per_day_im)
-```
 
-## Are there differences in activity patterns between weekdays and weekends?
-```{r}
 data_imputed$as_date <- as.Date(data_imputed$date, "%Y-%m-%d")
 data_imputed$weekday <- weekdays(data_imputed$as_date)
 weekend <- c("Saturday", "Sunday")
@@ -93,9 +59,5 @@ xyplot(x ~ interval | weekend, data = avg_per_interval_weekday,
        xlab = "Interval", ylab = "Number of steps",
        layout = c(1,2)
        )
-```
-```
-```
-```
-```
+
 
